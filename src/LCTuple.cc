@@ -25,7 +25,7 @@
 #include "VertexBranches.h"
 #include "JetBranches.h"
 #include "IsoLepBranches.h"
-
+#include "TimeOfFlightBranches.h"
 
 using namespace lcio ;
 using namespace marlin ;
@@ -192,6 +192,17 @@ registerProcessorParameter( "WriteIsoLepCollectionParameters" ,
 			      false
 			      );
 
+
+
+
+  registerProcessorParameter( "WriteTimeOfFlightCollectionParameters" ,
+                              "Switch to write out collection parameters",
+			      _recColWriteParameters ,
+			      false
+			      );
+
+
+
   registerInputCollection( LCIO::SIMTRACKERHIT,
 			   "SimTrackerHitCollection" , 
 			   "Name of the SimTrackerHit collection"  ,
@@ -232,6 +243,30 @@ registerProcessorParameter( "WriteIsoLepCollectionParameters" ,
 			   std::string("")
 			   );
 
+
+//PID
+  registerInputCollection( LCIO::RECONSTRUCTEDPARTICLE,
+                            "PFOs" , 
+                            "particle flow objects"  ,
+                           _pandoraPFOs ,
+                           std::string("PandoraPFOs") ) ;
+
+//  registerInputCollection( LCIO::MCPARTICLE,
+//			   "MCParticleCollection" , 
+//			   "Name of the MCParticle input collection"  ,
+//			   _mcParticleCollectionName ,
+//			   std::string("MCParticle") ) ;
+
+
+  registerInputCollection( LCIO::LCRELATION,
+			   "MCTruth2RecoLinkCollectionName" , 
+			   "true - reco relation collection"  ,
+			   _trueToReco,
+			   std::string("MCTruthRecoLink") ) ;
+
+
+//PID
+
   registerProcessorParameter( "WriteSimCalorimeterHitCollectionParameters" ,
                               "Switch to write out collection parameters",
 			      _schColWriteParameters ,
@@ -244,8 +279,8 @@ registerProcessorParameter( "WriteIsoLepCollectionParameters" ,
 			      _cahColWriteParameters ,
 			      false
 			      );
-  
-  
+
+
   StringVec relColNames ;
   registerInputCollections( LCIO::LCRELATION,
 			    "LCRelationCollections" , 
@@ -322,6 +357,7 @@ void LCTuple::init() {
   _cahBranches =  0 ;
   _vtxBranches =  0 ;
   _mcRelBranches = 0 ;
+  _tofBranches =  0 ;
 
   
   _evtBranches =  new EventBranches ;
@@ -414,6 +450,14 @@ void LCTuple::init() {
     _vtxBranches->initBranches( _tree ) ;
   }
 
+  if( _recColName.size() ) {
+    _tofBranches =  new TimeOfFlightBranches ;
+    _tofBranches->writeParameters(_recColWriteParameters);
+    _tofBranches->initBranches( _tree ) ;
+  }
+
+
+
   if( _pfoRelName.size() && _relName.size() )  {
       _mcRelBranches =  new MCParticleFromRelationBranches ;
       _mcRelBranches->writeParameters(_mcpColWriteParameters);
@@ -475,6 +519,8 @@ void LCTuple::processEvent( LCEvent * evt ) {
   LCCollection* trkCol =  getCollection ( evt , _trkColName ) ;
 
   LCCollection* cluCol =  getCollection ( evt , _cluColName ) ;
+ 
+// streamlog_out(DEBUG) << " reading cluster collection " << _cluColName << std::endl ;  
 
   LCCollection* sthCol =  getCollection ( evt , _sthColName ) ;
 
@@ -489,6 +535,9 @@ void LCTuple::processEvent( LCEvent * evt ) {
   LCCollection* relCol =  getCollection ( evt , _relName ) ;
 
   LCCollection* pfoRelCol =  getCollection ( evt , _pfoRelName ) ;
+
+
+
 
 
   unsigned  nRel = _relColNames.size() ;
@@ -517,11 +566,17 @@ void LCTuple::processEvent( LCEvent * evt ) {
 
   addIndexToCollection( cluCol ) ;
 
+//  streamlog_out(DEBUG) << " add index to cluster collection " << _cluColName << std::endl ;
+  
   addIndexToCollection( vtxCol ) ;
 
   addIndexToCollection( relCol ) ;
 
   addIndexToCollection( pfoRelCol ) ;
+
+
+
+
 
 
   //================================================
@@ -545,8 +600,6 @@ void LCTuple::processEvent( LCEvent * evt ) {
   
   if( trkCol ) _trkBranches->fill( trkCol , evt ) ;
   
-  if( cluCol ) _cluBranches->fill( cluCol , evt ) ;
-  
   if( sthCol ) _sthBranches->fill( sthCol , evt ) ;
 
   if( trhCol ) _trhBranches->fill( trhCol , evt ) ;
@@ -559,6 +612,15 @@ void LCTuple::processEvent( LCEvent * evt ) {
 
   if( relCol && pfoRelCol ) _mcRelBranches->fill( relCol, pfoRelCol , evt ) ;
 
+ // streamlog_out(DEBUG) << " before filling cluster branches " << _cluColName << std::endl ;  
+ 
+ if( cluCol ) _cluBranches->fill( cluCol , evt ) ; 
+ 
+// streamlog_out(DEBUG) << " before filling tof branches " << _cluColName << std::endl ;    
+ 
+ if( recCol ) _tofBranches->fill( recCol , evt ) ;
+ 
+// streamlog_out(DEBUG) << " after filling tof branches " << _cluColName << std::endl ;    
 
   for( unsigned i=0; i < nRel ; ++i) {
 
@@ -608,6 +670,7 @@ void LCTuple::end(){
   delete _trkBranches ; 
   delete _vtxBranches ; 
   delete _mcRelBranches ;
+  delete _tofBranches ;
   
   for( auto pidb : _pidBranchesVec ) delete pidb ;
   

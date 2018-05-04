@@ -15,7 +15,8 @@
  <execute>
   <processor name="MyAIDAProcessor"/>
   <processor name="MergeTrackerHits"/>
-  <XXXXprocessor name="MyCreateRecoRelations"/>
+  <processor name="MyCreateRecoRelations"/>
+  <processor name="MyMergeRPCollections"/>
   <processor name="MyLCTuple"/>  
  </execute>
 
@@ -127,10 +128,10 @@
   <parameter name="VertexCollection" type="string" lcioInType="Vertex"> BuildUpVertex </parameter>
 
   <!--Name of the MCParticle collection-->
-  <parameter name="MCParticleCollection" type="string" lcioInType="MCParticle"> MCParticlesSkimmed</parameter>
+  <parameter name="MCParticleCollection" type="string" lcioInType="MCParticle"> MCParticle</parameter>
 
   <!--Name of the ReconstructedParticle collection-->
-  <parameter name="RecoParticleCollection" type="string" lcioInType="ReconstructedParticle"> MergedRPCollection</parameter>
+  <parameter name="RecoParticleCollection" type="string" lcioInType="ReconstructedParticle"> PandoraPFOs </parameter>
 
   <!--Name of the SimCalorimeterHit collection-->
   <parameter name="SimCalorimeterHitCollection" type="string" lcioInType="SimCalorimeterHit"> </parameter>
@@ -148,5 +149,7 @@
   <parameter name="Verbosity" type="string">DEBUG </parameter>
 </processor>
 
-
+  <!--Name of the TimeOfFlight collection
+  <parameter name="TimeOfFlightCollection" type="string" lcioInType="ReconstructedParticle"> PandoraPFOs </parameter>
+-->
 </marlin>

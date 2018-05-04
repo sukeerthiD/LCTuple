@@ -8,7 +8,6 @@
 #include "MCParticleFromRelationBranches.h"
 
 #include "JetBranches.h"
-#include "PIDBranches.h"
 
 
 using namespace lcio ;
@@ -37,13 +36,6 @@ class CollectionBranches;
 
 class LCTuple : public Processor {
   
-  struct PIDBranchDef{
-    std::string algoName{} ;
-    std::string prefix{} ;
-    std::vector<std::string> pNames{} ;
-    std::vector<std::string> bNames{} ;
-  } ;
-
  public:
   
   virtual Processor*  newProcessor() { return new LCTuple ; }
@@ -75,74 +67,69 @@ class LCTuple : public Processor {
   
  protected:
 
-  void decodePIDBranchDefinitions() ;
-
   /** Input collection name.
    */
-  std::string _mcpColName {};
-  std::string _mcpRemoveOverlayColName {};
-  std::string _recColName {};
-  std::string _jetColName {};
-  std::string _isolepColName {};  
-  std::string _trkColName {};
-  std::string _cluColName {};
-  std::string _sthColName {};
-  std::string _trhColName {};
-  std::string _schColName {};
-  std::string _cahColName {};
-  std::string _vtxColName {};
-  std::string _pfoRelName {};
-  std::string _relName {};
+  std::string _mcpColName ;
+  std::string _mcpRemoveOverlayColName ;
+  std::string _recColName ;
+  std::string _jetColName ;
+  std::string _isolepColName ;  
+  std::string _trkColName ;
+  std::string _cluColName ;
+  std::string _sthColName ;
+  std::string _trhColName ;
+  std::string _schColName ;
+  std::string _cahColName ;
+  std::string _vtxColName ;
+  std::string _pfoRelName ;
+  std::string _relName ;
 
 
 
-  bool _mcpColWriteParameters {};
-  bool _recColWriteParameters {};
-  bool _jetColWriteParameters {};
-  bool _isolepColWriteParameters {}; 
-  bool _trkColWriteParameters {};
-  bool _cluColWriteParameters {};
-  bool _sthColWriteParameters {};
-  bool _trhColWriteParameters {};
-  bool _schColWriteParameters {};
-  bool _cahColWriteParameters {};
-  bool _vtxColWriteParameters {};
+  bool _mcpColWriteParameters ;
+  bool _recColWriteParameters ;
+  bool _jetColWriteParameters ;
+  bool _isolepColWriteParameters ; 
+  bool _trkColWriteParameters ;
+  bool _cluColWriteParameters ;
+  bool _sthColWriteParameters ;
+  bool _trhColWriteParameters ;
+  bool _schColWriteParameters ;
+  bool _cahColWriteParameters ;
+  bool _vtxColWriteParameters ;
+  bool _tofColWriteParameters ;
 
 
-  bool _jetColExtraParameters {};                 /* Enables writing extra jet parameters */
-  bool _jetColTaggingParameters {};               /* Enables writing jet tagging parameters */
+  bool _jetColExtraParameters ;                 /* Enables writing extra jet parameters */
+  bool _jetColTaggingParameters ;               /* Enables writing jet tagging parameters */
 
 
-  StringVec _relColNames {};
-  StringVec _relPrefixes {};
+  StringVec _relColNames ;
+  StringVec _relPrefixes ;
 
-  StringVec _pidBranchDefinition {};
+  TTree* _tree ;
+
+  CWBranchesSet* _evtBranches ;
+  CollectionBranches* _mcpBranches ;
+  CollectionBranches* _mcpremoveoverlayBranches ;
+  CollectionBranches* _recBranches ;
+//  CollectionBranches* _jetBranches ;
+  JetBranches* _jetBranches ;
+  CollectionBranches* _isolepBranches ;
+  CollectionBranches* _trkBranches ;
+  CollectionBranches* _cluBranches ;
+  CollectionBranches* _sthBranches ;
+  CollectionBranches* _trhBranches ;
+  CollectionBranches* _schBranches ;
+  CollectionBranches* _cahBranches ;
+  CollectionBranches* _vtxBranches ;
+  CollectionBranches* _tofBranches ;
+  MCParticleFromRelationBranches* _mcRelBranches ;
   
-  TTree* _tree {};
-
-  CWBranchesSet* _evtBranches {};
-  CollectionBranches* _mcpBranches {};
-  CollectionBranches* _mcpremoveoverlayBranches {};
-  CollectionBranches* _recBranches {};
-//  CollectionBranches* _jetBranches {};
-  JetBranches* _jetBranches {};
-  CollectionBranches* _isolepBranches {};
-  CollectionBranches* _trkBranches {};
-  CollectionBranches* _cluBranches {};
-  CollectionBranches* _sthBranches {};
-  CollectionBranches* _trhBranches {};
-  CollectionBranches* _schBranches {};
-  CollectionBranches* _cahBranches {};
-  CollectionBranches* _vtxBranches {};
-  MCParticleFromRelationBranches* _mcRelBranches {};
+  std::vector<CWBranchesSet*> _relBranchesVec ;
   
-  std::vector<PIDBranches*> _pidBranchesVec {};
-  std::vector<CWBranchesSet*> _relBranchesVec {};
-  
-  int _nRun {};
-  int _nEvt {};
-
-  std::vector<PIDBranchDef> _pidBranchDefs ;
+  int _nRun ;
+  int _nEvt ;
 } ;
 
 #endif
